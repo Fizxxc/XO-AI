@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>404 • XO AI</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    :root{
+      --bg:#0f0f10;
+      --fg:#e5e5e5;
+      --accent:#f97316;     /* oranye biar beda dari halaman offline */
+    }
+    html.light{
+      --bg:#ffffff;
+      --fg:#1f2937;
+    }
+    body{background:var(--bg);color:var(--fg);}
+  </style>
+</head>
+
+<body class="min-h-screen flex flex-col items-center justify-center text-center gap-6 px-4">
+
+  <!-- ICON 404 -->
+  <div class="p-4 rounded-full bg-[var(--accent)]/20">
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 stroke-[var(--accent)]" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+      <rect x="2" y="6" width="20" height="8" rx="1"/><path d="M17 14v7"/><path d="M7 14v7"/><path d="M17 3v3"/><path d="M7 3v3"/><path d="M10 14 2.3 6.3"/><path d="m14 6 7.7 7.7"/><path d="m8 6 8 8"/>
+    </svg>
+  </div>
+
+  <h1 class="text-3xl font-bold">404 – Halaman Tidak Ditemukan</h1>
+  <p class="max-w-md">Ups! Tautan yang kamu tuju tidak ada. Mungkin sudah dipindahkan atau dihapus.</p>
+
+  <a href="/" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--accent)] text-white hover:opacity-90 transition">
+    Kembali ke Beranda
+  </a>
+</body>
+</html>
