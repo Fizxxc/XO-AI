@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="dark">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>XO AI | V1.4</title>
+<title>XO AI | V1.5</title>
 
 <!-- Tailwind + Typography -->
 <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
@@ -13,23 +13,28 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
 
 <style>
-/* ─────────  SKEMA WARNA BERBASIS VAR  ───────── */
+/**************  SKEMA WARNA BERBASIS CSS VAR  **************/
 :root{
   --bg:#0f0f10;
   --fg:#e5e5e5;
   --bubble-bot:#1e1e20;
   --bubble-user:#9333ea;
+  --bubble-user-text:#ffffff;
 }
 html.light{
   --bg:#ffffff;
   --fg:#1f2937;
   --bubble-bot:#f3f4f6;
   --bubble-user:#7c3aed;
+  --bubble-user-text:#ffffff;
 }
 html{font-family:"Inter",ui-sans-serif,system-ui}
 body{background:var(--bg);color:var(--fg);margin:0;transition:background .3s,color .3s}
 
-/* ───── animasi & utilitas ───── */
+/* pastikan teks di markdown ikut warna fg */
+.prose :where(*){color:inherit;}
+
+/**************  animasi & utilitas  **************/
 @keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
 .badge-pulse{animation:pulse 2s ease-in-out infinite}
 
@@ -45,10 +50,9 @@ body{background:var(--bg);color:var(--fg);margin:0;transition:background .3s,col
 /* ikon tema */
 #themeBtn svg{position:absolute;inset:0;transition:opacity .25s,transform .25s}
 html.dark  #moon,
-html.light #sun {opacity:1;transform:scale(1)}
+html.light #sun{opacity:1;transform:scale(1)}
 html.dark  #sun,
 html.light #moon{opacity:0;transform:scale(.75)}
-
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -58,7 +62,7 @@ html.light #moon{opacity:0;transform:scale(.75)}
 
 <!-- ───── Splash / loading overlay ───── -->
 <div id="splash" class="fixed inset-0 flex flex-col items-center justify-center gap-4 bg-[var(--bg)] z-50">
-  <div class="relative w-14 h-14">
+  <div class="relative w-14 h-14 overflow-hidden rounded-full">
     <!-- ikon-ikon berganti -->
     <svg id="icon1" xmlns="http://www.w3.org/2000/svg" class="abs w-full h-full text-[var(--bubble-user)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
     <svg id="icon2" xmlns="http://www.w3.org/2000/svg" class="abs w-full h-full text-[var(--bubble-user)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/><path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"/><path d="M17.599 6.5a3 3 0 0 0 .399-1.375"/><path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"/><path d="M3.477 10.896a4 4 0 0 1 .585-.396"/><path d="M19.938 10.5a4 4 0 0 1 .585.396"/><path d="M6 18a4 4 0 0 1-1.967-.516"/><path d="M19.967 17.484A4 4 0 0 1 18 18"/></svg>
@@ -72,10 +76,10 @@ html.light #moon{opacity:0;transform:scale(.75)}
 <header class="border-b border-neutral-800 p-4 flex items-center gap-3">
   <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-[var(--bubble-user)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
   <h1 class="text-lg font-semibold tracking-wide select-none">XO&nbsp;AI</h1>
-  <span class="text-[10px] uppercase bg-purple-600/30 px-2 py-0.5 rounded badge-pulse select-none">release&nbsp;v1.4</span>
+  <span class="text-[10px] uppercase bg-purple-600/30 px-2 py-0.5 rounded badge-pulse select-none">release&nbsp;v1.5</span>
 
   <!-- tombol tema -->
-  <button id="themeBtn" class="relative w-8 h-8 ml-auto rounded-full hover:bg-gray-700/20 transition-colors">
+  <button id="themeBtn" class="relative w-8 h-8 ml-auto rounded-full hover:bg-gray-700/20 light:hover:bg-gray-200/40 transition-colors">
     <!-- sun -->
     <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
     <!-- moon -->
@@ -86,12 +90,11 @@ html.light #moon{opacity:0;transform:scale(.75)}
 <!-- ───── Chat area ───── -->
 <main id="chatArea" class="flex-1 overflow-y-auto p-4 flex flex-col gap-4"></main>
 
-<form id="chatForm" class="border-t border-neutral-800 p-3 flex items-center gap-2 bg-neutral-900/60 backdrop-blur-md">
+<form id="chatForm" class="border-t border-neutral-800 p-3 flex items-center gap-2 bg-neutral-900/60 light:bg-white/60 backdrop-blur-md">
   <input id="userInput" autocomplete="off" placeholder="Ketik pesan…"
-         class="flex-1 bg-neutral-800/70 text-sm px-4 py-2 rounded-full focus:outline-none focus:ring focus:ring-purple-600/50"/>
-  <button class="bg-[var(--bubble-user)] hover:opacity-90 active:opacity-100 transition-opacity text-white rounded-full p-2" aria-label="Kirim">
-    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
-         stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="m22 2-7 20-4-9-9-4 20-7z"/></svg>
+         class="flex-1 bg-neutral-800/70 light:bg-white/80 text-sm px-4 py-2 rounded-full focus:outline-none focus:ring focus:ring-purple-600/50"/>
+  <button class="bg-[var(--bubble-user)] hover:opacity-90 active:opacity-100 transition-opacity text-[var(--bubble-user-text)] rounded-full p-2" aria-label="Kirim">
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="m22 2-7 20-4-9-9-4 20-7z"/></svg>
   </button>
 </form>
 
@@ -118,21 +121,20 @@ function botAvatar(){
 function addMsg(text,from){
   const wrap=document.createElement('div');
   wrap.className='flex gap-2 items-start max-w-prose';
+
   const bubble=document.createElement('div');
-  bubble.className=`prose prose-sm max-w-none px-4 py-3 rounded-2xl animate-fadeIn ${
-     from==='user'?'bg-[var(--bubble-user)] text-white':'bg-[var(--bubble-bot)]'
-  }`;
+  bubble.className=`prose prose-sm max-w-none px-4 py-3 rounded-2xl animate-fadeIn ${from==='user'?'bg-[var(--bubble-user)] text-[var(--bubble-user-text)]':'bg-[var(--bubble-bot)]'}`;
   bubble.innerHTML=marked.parse(text);
+
   if(from==='bot'){
-    wrap.insertAdjacentHTML('beforeend',bubble.outerHTML);
-    wrap.insertAdjacentHTML('afterbegin',botAvatar());
-    // label di dalam bubble
-    bubble.prepend(Object.assign(document.createElement('span'),{
-       textContent:'XO AI',
-       className:'block text-[10px] uppercase text-[var(--bubble-user)]/80 mb-1'
-    }));
-    wrap.replaceChild(bubble,wrap.children[1]);
-  }else wrap.classList.add('self-end');
+    wrap.appendChild(document.createRange().createContextualFragment(botAvatar()));
+    const label=document.createElement('span');
+    label.textContent='XO AI';
+    label.className='block text-[10px] uppercase text-[var(--bubble-user)]/80 mb-1';
+    bubble.prepend(label);
+  } else {
+    wrap.classList.add('self-end');
+  }
 
   wrap.appendChild(bubble);
   chatArea.appendChild(wrap);
@@ -149,8 +151,7 @@ function typing(el,dur=2500){
 }
 
 async function ask(prompt){
-  const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({prompt})});
+  const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt})});
   const data=await res.json();
   return res.ok?data.answer:`Error: ${data.error}`;
 }
@@ -173,7 +174,7 @@ window.addEventListener('load',()=>{
   setTimeout(()=>{
     document.getElementById('splash').classList.add('hidden');
     addMsg('Halo! 👋<br/>Saya <strong>XO AI</strong>. Ada yang bisa saya bantu hari ini?','bot');
-  },4000);
+  },3500);
 });
 </script>
 </body>
