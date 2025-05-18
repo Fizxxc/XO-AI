@@ -1,60 +1,50 @@
-const CACHE_NAME = 'xoai-v1';
-const OFFLINE_URL = '/offline.html';
-const ASSETS = [
-  '/',
+// @ts-check
+
+/* ------------ Konstanta ------------ */
+const CACHE_NAME   = 'xoai-v1';
+const OFFLINE_URL  = '/offline.html';
+const CORE_ASSETS  = [
+  '/',               // halaman utama
   OFFLINE_URL,
-  '/chat.js',
+  '/chat.js'
 ];
 
-// Install: cache asset penting termasuk offline.html
+/* ---------- INSTALL: seed cache ---------- */
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
+    caches.open(CACHE_NAME).then(c => c.addAll(CORE_ASSETS))
   );
-  self.skipWaiting();
+  self.skipWaiting();     // langsung aktif
 });
 
-// Activate: hapus cache lama yang tidak cocok
+/* ---------- ACTIVATE: bersih-bersih ---------- */
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys =>
       Promise.all(
-        keys.filter(key => key !== CACHE_NAME)
-            .map(key => caches.delete(key))
+        keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
       )
     )
   );
   self.clients.claim();
 });
 
-// Fetch: network-first untuk navigasi, fallback ke cache & offline.html
+/* ---------- FETCH: network-first ---------- */
 self.addEventListener('fetch', event => {
-  const { request } = event;
+  // Hanya tangani permintaan dokumen (HTML)
+  if (event.request.mode !== 'navigate') return;
 
-  if (request.mode === 'navigate') {
-    event.respondWith(
-      fetch(request)
-        .then(response => {
-          // Simpan cache response terbaru
-          const copy = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(request, copy));
-          return response;
-        })
-        .catch(async () => {
-          // Kalau jaringan gagal, cari di cache
-          const cachedResponse = await caches.match(request);
-          if (cachedResponse) return cachedResponse;
-          // Kalau tidak ada di cache, tampilkan offline.html
-          return caches.match(OFFLINE_URL);
-        })
-    );
-  }
-  else {
-    // Untuk request selain navigasi, coba respon cache dulu baru jaringan
-    event.respondWith(
-      caches.match(request).then(cachedResponse => {
-        return cachedResponse || fetch(request);
+  event.respondWith(
+    fetch(event.request)
+      .then(res => {
+        // Simpan salinan halaman terbaru
+        const clone = res.clone();
+        caches.open(CACHE_NAME).then(c => c.put(event.request, clone));
+        return res;
       })
-    );
-  }
+      .catch(() =>
+        // offline → coba cache → fallback offline.html
+        caches.match(event.request).then(res => res || caches.match(OFFLINE_URL))
+      )
+  );
 });
