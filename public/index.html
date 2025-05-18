@@ -151,8 +151,11 @@ body.dark #userInput {
                 focus:ring focus:ring-purple-600/50
                 bg-white light:bg-white dark:bg-black text-black dark:text-white"/>
   <button class="bg-[var(--bubble-user)] hover:opacity-90 active:opacity-100 transition-opacity text-[var(--bubble-user-text)] rounded-full p-2" aria-label="Kirim">
-    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="m22 2-7 20-4-9-9-4 20-7z"/></svg>
-  </button>
+  <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+    <line x1="22" y1="2" x2="11" y2="13"/>
+    <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+  </svg>
+</button>
 </form>
 
 <script>
