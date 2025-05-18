@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Offline • XO AI</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    :root{
+      --bg:#0f0f10;
+      --fg:#e5e5e5;
+      --accent:#9333ea;
+    }
+    html.light{
+      --bg:#ffffff;
+      --fg:#1f2937;
+    }
+    body{background:var(--bg);color:var(--fg);}
+  </style>
+</head>
+
+<body class="min-h-screen flex flex-col items-center justify-center text-center gap-6 px-4">
+
+  <!-- ICON OFFLINE -->
+  <div class="p-4 rounded-full bg-[var(--accent)]/20">
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 stroke-[var(--accent)]" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+      <path d="m19 5 3-3"/><path d="m2 22 3-3"/><path d="M6.3 20.3a2.4 2.4 0 0 0 3.4 0L12 18l-6-6-2.3 2.3a2.4 2.4 0 0 0 0 3.4Z"/><path d="M7.5 13.5 10 11"/><path d="M10.5 16.5 13 14"/><path d="m12 6 6 6 2.3-2.3a2.4 2.4 0 0 0 0-3.4l-2.6-2.6a2.4 2.4 0 0 0-3.4 0Z"/>
+    </svg>
+  </div>
+
+  <h1 class="text-3xl font-bold">Koneksi Terputus</h1>
+  <p class="max-w-md">Sepertinya kamu sedang <em>offline</em>. Periksa sambungan internetmu, lalu coba muat ulang halaman.</p>
+
+  <a href="/" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--accent)] text-white hover:opacity-90 transition">
+    Muat Ulang
+  </a>
+</body>
+</html>
