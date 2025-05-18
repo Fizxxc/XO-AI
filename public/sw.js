@@ -1,49 +1,60 @@
 const CACHE_NAME = 'xoai-v1';
 const OFFLINE_URL = '/offline.html';
 const ASSETS = [
-  '/',                 // halaman utama
-  '/offline.html',
-  // '/styles.css',       // tambahkan asset penting
-  '/chat.js'
+  '/',
+  OFFLINE_URL,
+  '/chat.js',
 ];
 
-// install: simpan asset dasar
+// Install: cache asset penting termasuk offline.html
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(c => c.addAll(ASSETS))
+    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
   );
-  self.skipWaiting();        // paksa aktif
+  self.skipWaiting();
 });
 
-// activate: hapus cache lama jika ada
+// Activate: hapus cache lama yang tidak cocok
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE_NAME)
-                      .map(k => caches.delete(k)))
+      Promise.all(
+        keys.filter(key => key !== CACHE_NAME)
+            .map(key => caches.delete(key))
+      )
     )
   );
   self.clients.claim();
 });
 
-// fetch: network-first → fallback cache → offline.html
+// Fetch: network-first untuk navigasi, fallback ke cache & offline.html
 self.addEventListener('fetch', event => {
   const { request } = event;
 
-  // hanya tangani permintaan navigasi dokumen
   if (request.mode === 'navigate') {
     event.respondWith(
-      fetch(request)                 // coba jaringan dulu
-        .then(res => {
-          // simpan halaman baru ke cache (optional)
-          const clone = res.clone();
-          caches.open(CACHE_NAME).then(c => c.put(request, clone));
-          return res;
+      fetch(request)
+        .then(response => {
+          // Simpan cache response terbaru
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(request, copy));
+          return response;
         })
-        .catch(() =>
-          caches.match(request)      // ada di cache?
-            .then(res => res || caches.match(OFFLINE_URL))
-        )
+        .catch(async () => {
+          // Kalau jaringan gagal, cari di cache
+          const cachedResponse = await caches.match(request);
+          if (cachedResponse) return cachedResponse;
+          // Kalau tidak ada di cache, tampilkan offline.html
+          return caches.match(OFFLINE_URL);
+        })
+    );
+  }
+  else {
+    // Untuk request selain navigasi, coba respon cache dulu baru jaringan
+    event.respondWith(
+      caches.match(request).then(cachedResponse => {
+        return cachedResponse || fetch(request);
+      })
     );
   }
 });
