@@ -143,16 +143,37 @@ body.dark #userInput {
 
 <script>
 /* ───── Tema: inisialisasi berdasar preferensi / localStorage ───── */
-const prefersDark=window.matchMedia('(prefers-color-scheme: dark)').matches;
-const saved=localStorage.getItem('theme');
-if((saved==='dark')||(!saved&&prefersDark)) document.documentElement.classList.add('dark');
-else document.documentElement.classList.add('light');
+const root = document.documentElement;
+const themeBtn = document.getElementById('themeBtn');
 
-document.getElementById('themeBtn').addEventListener('click',()=>{
-  document.documentElement.classList.toggle('dark');
-  document.documentElement.classList.toggle('light');
-  localStorage.setItem('theme',document.documentElement.classList.contains('dark')?'dark':'light');
+function initTheme() {
+  const saved = localStorage.getItem('theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+  if (saved === 'dark' || (!saved && prefersDark)) {
+    root.classList.add('dark');
+    root.classList.remove('light');
+  } else {
+    root.classList.add('light');
+    root.classList.remove('dark');
+  }
+}
+
+themeBtn.addEventListener('click', () => {
+  if (root.classList.contains('dark')) {
+    root.classList.remove('dark');
+    root.classList.add('light');
+    localStorage.setItem('theme', 'light');
+  } else {
+    root.classList.add('dark');
+    root.classList.remove('light');
+    localStorage.setItem('theme', 'dark');
+  }
 });
+
+// Inisialisasi tema saat halaman dimuat
+window.addEventListener('DOMContentLoaded', initTheme);
+
 
 /* ───── Chat helper ───── */
 const chatArea=document.getElementById('chatArea');
