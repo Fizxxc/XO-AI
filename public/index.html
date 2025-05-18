@@ -47,21 +47,29 @@ body{background:var(--bg);color:var(--fg);margin:0;transition:background .3s,col
 #icon1{animation:fadeCycle 3s linear infinite}
 #icon2{animation:fadeCycle 3s linear infinite 1s}
 #icon3{animation:fadeCycle 3s linear infinite 2s}
-
-/* ikon tema */
 #themeBtn svg {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 20px;  /* kurang dari tombol 32px (w-8 = 2rem = 32px) */
+  width: 20px;
   height: 20px;
   transform: translate(-50%, -50%);
-  transition: opacity .25s, transform .25s;
+  transition: opacity 0.25s, transform 0.25s;
 }
-html.dark  #moon,
-html.light #sun{opacity:1;transform:scale(1)}
-html.dark  #sun,
-html.light #moon{opacity:0;transform:scale(.75)}
+
+html.dark #moon,
+html.light #sun {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+html.dark #sun,
+html.light #moon {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.75);
+  pointer-events: none; /* opsional agar ikon tak bisa diklik saat hidden */
+}
+
 
   /* input kirim pesan, warna background dan text berbeda sesuai tema */
 body.light #userInput {
