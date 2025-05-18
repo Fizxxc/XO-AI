@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>XO AI</title>
+
+<!-- Tailwind + Typography -->
+<script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+
+<!-- Google Fonts Inter variable -->
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+
+<style>
+:root{color-scheme:dark}
+html{font-family:"Inter",ui-sans-serif,system-ui}
+body{background:#0f0f10;color:#e5e5e5;margin:0}
+
+@keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
+.badge-pulse{animation:pulse 2s ease-in-out infinite}
+
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.animate-fadeIn{animation:fadeIn .25s ease}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+
+<body class="flex flex-col min-h-screen">
+<header class="border-b border-neutral-800 p-4 flex items-center gap-3">
+  <div class="w-5 h-5 rounded-full bg-gradient-to-br from-sky-400 via-purple-500 to-fuchsia-500 animate-pulse"></div>
+  <h1 class="text-lg font-semibold tracking-wide">XO AI</h1>
+  <span class="text-[10px] uppercase bg-purple-600/30 px-2 py-0.5 rounded-md badge-pulse">release v1.0</span>
+</header>
+
+<main id="chatArea" class="flex-1 overflow-y-auto p-4 flex flex-col gap-4"></main>
+
+<form id="chatForm" class="border-t border-neutral-800 p-3 flex items-center gap-2 bg-neutral-900/60 backdrop-blur-md">
+  <input id="userInput" autocomplete="off" placeholder="Ketik pesan…"
+         class="flex-1 bg-neutral-800/70 text-sm px-4 py-2 rounded-full focus:outline-none focus:ring focus:ring-purple-600/50"/>
+  <button class="bg-purple-600 hover:bg-purple-500 active:bg-purple-700 transition-colors text-white rounded-full p-2" aria-label="Kirim">
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
+         stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="m22 2-7 20-4-9-9-4 20-7z"/></svg>
+  </button>
+</form>
+
+<script>
+const chatArea=document.getElementById('chatArea');
+
+function addMsg(text,from){
+  const el=document.createElement('div');
+  el.className=`prose prose-invert max-w-none px-4 py-3 rounded-2xl animate-fadeIn ${
+      from==='user'?'self-end bg-purple-600 text-white':'bg-neutral-800'
+    }`;
+  el.innerHTML=marked.parse(text);
+  chatArea.appendChild(el);
+  chatArea.scrollTop=chatArea.scrollHeight;
+  return el;
+}
+
+function typing(el,dur=2500){
+  const frames=['●','●●','●●●'];
+  let i=0;
+  return new Promise(r=>{
+    const iv=setInterval(()=>{el.textContent=frames[i];i=(i+1)%frames.length;},400);
+    setTimeout(()=>{clearInterval(iv);r();},dur);
+  });
+}
+
+async function ask(prompt){
+  const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({prompt})});
+  const data=await res.json();
+  return res.ok?data.answer:`Error: ${data.error}`;
+}
+
+document.getElementById('chatForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const q=document.getElementById('userInput').value.trim();
+  if(!q) return;
+  addMsg(q,'user');
+  e.target.reset();
+
+  const hold=addMsg('', 'bot');
+  await typing(hold,2500);
+  hold.innerHTML=marked.parse(await ask(q));
+});
+</script>
+</body>
+</html>
