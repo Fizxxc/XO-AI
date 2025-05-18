@@ -262,6 +262,12 @@ window.addEventListener('load',()=>{
     addMsg('Halo! 👋<br/>Saya <strong>XO AI</strong>. Ada yang bisa saya bantu hari ini?','bot');
   },3500);
 });
+
+  if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js');
+  });
+}
 </script>
 </body>
 </html>
