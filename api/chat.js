@@ -1,11 +1,28 @@
-import { createClient } from '@supabase/supabase-js';
-
 export const config = { runtime: 'edge' };
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_ANON_KEY
-);
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
+const SUPABASE_TABLE = 'chat_logs'; // sesuaikan nama tabelmu
+
+async function supabaseInsert(data) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}`, {
+    method: 'POST',
+    headers: {
+      apikey: SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+      'Content-Type': 'application/json',
+      Prefer: 'return=representation' // Supabase agar mengembalikan row yg baru dimasukkan
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw new Error(`Supabase insert error: ${JSON.stringify(errorData)}`);
+  }
+
+  return await res.json();
+}
 
 export default async function handler(req) {
   if (req.method !== 'POST') {
@@ -14,7 +31,6 @@ export default async function handler(req) {
 
   const contentType = req.headers.get('content-type') || '';
 
-  // Jika JSON biasa (chat tanpa file)
   if (contentType.includes('application/json')) {
     const { prompt } = await req.json();
     if (!prompt) {
@@ -48,14 +64,27 @@ export default async function handler(req) {
     }
 
     const answer = data.choices?.[0]?.message?.content?.trim() || 'Maaf, terjadi kesalahan.';
+
+    // Simpan prompt dan jawaban ke Supabase via REST API
+    try {
+      await supabaseInsert({ prompt, answer, created_at: new Date().toISOString() });
+    } catch (error) {
+      console.error(error);
+      // Bisa tetap lanjutkan jika error insert ke DB, tapi beri tahu user
+      return new Response(
+        JSON.stringify({ answer, warning: 'Gagal menyimpan chat ke database.' }),
+        { headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
     return new Response(JSON.stringify({ answer }), { headers: { 'Content-Type': 'application/json' } });
   }
 
-  // Jika menerima multipart/form-data (untuk file upload)
   if (contentType.includes('multipart/form-data')) {
-    return new Response(JSON.stringify({ error: 'Gunakan frontend untuk upload via Supabase langsung (signed URL)' }), {
-      status: 400
-    });
+    return new Response(
+      JSON.stringify({ error: 'Gunakan frontend untuk upload via Supabase langsung (signed URL)' }),
+      { status: 400 }
+    );
   }
 
   return new Response(JSON.stringify({ error: 'Format request tidak dikenali' }), { status: 400 });
