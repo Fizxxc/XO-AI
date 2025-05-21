@@ -306,7 +306,7 @@ fileInput.onchange = async () => {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ filename })
   });
-
+};
   const { url, path } = await res.json();
   if (!url) return alert('Gagal dapatkan signed URL');
 
