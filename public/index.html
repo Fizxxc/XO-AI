@@ -283,6 +283,69 @@ window.addEventListener('load',()=>{
   },3500);
 });
 
+// Uploads
+  const chatForm = document.getElementById('chatForm');
+const userInput = document.getElementById('userInput');
+const fileInput = document.getElementById('fileInput');
+const uploadBtn = document.getElementById('uploadBtn');
+
+let uploadedFileUrl = '';
+
+uploadBtn.onclick = () => fileInput.click();
+
+fileInput.onchange = async () => {
+  const file = fileInput.files[0];
+  if (!file) return;
+
+  const filename = `${Date.now()}_${file.name}`;
+
+  // Dapatkan signed URL dari backend
+  const res = await fetch('/api/chat/get-signed-url', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ filename })
+  });
+
+  const { url, path } = await res.json();
+  if (!url) return alert('Gagal dapatkan signed URL');
+
+  // Upload ke Supabase
+  const upload = await fetch(url, {
+    method: 'PUT',
+    headers: { 'Content-Type': file.type },
+    body: file
+  });
+
+  if (upload.ok) {
+    uploadedFileUrl = `https://${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/media/${path}`;
+    alert('Upload berhasil!');
+  } else {
+    alert('Upload gagal');
+  }
+};
+
+chatForm.onsubmit = async (e) => {
+  e.preventDefault();
+  const prompt = userInput.value;
+  if (!prompt) return;
+
+  const finalPrompt = uploadedFileUrl
+    ? `${prompt}\n\n[Lampiran: ${uploadedFileUrl}]`
+    : prompt;
+
+  const res = await fetch('/api/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ prompt: finalPrompt })
+  });
+
+  const data = await res.json();
+  alert(data.answer || 'Tidak ada balasan');
+  userInput.value = '';
+  uploadedFileUrl = '';
+};
+
+  // SW SYSTEM
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker
