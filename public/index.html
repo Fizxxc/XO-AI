@@ -285,7 +285,7 @@ window.addEventListener('load',()=>{
 });
 
 // Uploads
-  const chatForm = document.getElementById('chatForm');
+const chatForm = document.getElementById('chatForm');
 const userInput = document.getElementById('userInput');
 const fileInput = document.getElementById('fileInput');
 const uploadBtn = document.getElementById('uploadBtn');
@@ -294,46 +294,25 @@ let uploadedFileUrl = '';
 
 uploadBtn.onclick = () => fileInput.click();
 
-fileInput.onchange = async () => {
-  const file = fileInput.files[0];
-  if (!file) return;
-
-  const filename = `${Date.now()}_${file.name}`;
-
-  // Dapatkan signed URL dari backend
-  const res = await fetch('/api/chat/get-signed-url', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ filename })
-  });
-};
-  const { url, path } = await res.json();
-  if (!url) return alert('Gagal dapatkan signed URL');
-
-  const supabaseUrl = process.env.SUPABASE_URL; // dari env
-const supabaseAnonKey = process.env.SUPABASE_ANON_KEY; // dari env
-
 fileInput.onchange = async (e) => {
   const file = e.target.files[0];
   if (!file) return;
 
-  // Generate path unik supaya ga bentrok
   const path = `media/${Date.now()}_${file.name}`;
 
-  // Minta signed URL dari backend atau langsung dari supabase-js di frontend
-  // Contoh langsung fetch signed URL dari backend (asumsi ada endpoint API buat generate signed url)
   const signedUrlRes = await fetch(`/api/signed-url?path=${encodeURIComponent(path)}`);
   const { signedUrl } = await signedUrlRes.json();
 
-  // Upload file pakai PUT ke signed URL
+  if (!signedUrl) return alert('Gagal mendapatkan signed URL');
+
   const upload = await fetch(signedUrl, {
     method: 'PUT',
     headers: { 'Content-Type': file.type },
-    body: file
+    body: file,
   });
 
   if (upload.ok) {
-    // URL publik file yang bisa diakses
+    const supabaseUrl = 'https://your-project.supabase.co'; // Ganti dengan URL Supabase kamu
     uploadedFileUrl = `${supabaseUrl}/storage/v1/object/public/${path}`;
     alert('Upload berhasil!');
   } else {
@@ -343,21 +322,27 @@ fileInput.onchange = async (e) => {
 
 chatForm.onsubmit = async (e) => {
   e.preventDefault();
-  const prompt = userInput.value;
+  const prompt = userInput.value.trim();
   if (!prompt) return;
+
+  addMsg(prompt, 'user');
+  const hold = addMsg('', 'bot');
 
   const finalPrompt = uploadedFileUrl
     ? `${prompt}\n\n[Lampiran: ${uploadedFileUrl}]`
     : prompt;
 
+  await typing(hold, 2000);
+
   const res = await fetch('/api/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ prompt: finalPrompt })
+    body: JSON.stringify({ prompt: finalPrompt }),
   });
 
   const data = await res.json();
-  alert(data.answer || 'Tidak ada balasan');
+  hold.innerHTML = marked.parse(data.answer || 'Tidak ada balasan');
+
   userInput.value = '';
   uploadedFileUrl = '';
   fileInput.value = '';
