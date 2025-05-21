@@ -143,7 +143,8 @@ body.dark #userInput {
 
 <!-- ───── Chat area ───── -->
 <main id="chatArea" class="flex-1 overflow-y-auto p-4 flex flex-col gap-4"></main>
-
+<!-- Preview file upload -->
+<div id="filePreview" class="p-2 px-4 mb-2 max-w-xs mx-4 rounded-lg bg-[var(--bubble-user)] text-[var(--bubble-user-text)] hidden"></div>
 <form id="chatForm" enctype="multipart/form-data"
   class="border-t border-neutral-800 p-3 flex items-center gap-2
          bg-white light:bg-white dark:bg-black backdrop-blur-md">
@@ -309,15 +310,31 @@ fileInput.onchange = async () => {
   const { url, path } = await res.json();
   if (!url) return alert('Gagal dapatkan signed URL');
 
-  // Upload ke Supabase
-  const upload = await fetch(url, {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL; // dari env
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY; // dari env
+
+fileInput.onchange = async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  // Generate path unik supaya ga bentrok
+  const path = `media/${Date.now()}_${file.name}`;
+
+  // Minta signed URL dari backend atau langsung dari supabase-js di frontend
+  // Contoh langsung fetch signed URL dari backend (asumsi ada endpoint API buat generate signed url)
+  const signedUrlRes = await fetch(`/api/signed-url?path=${encodeURIComponent(path)}`);
+  const { signedUrl } = await signedUrlRes.json();
+
+  // Upload file pakai PUT ke signed URL
+  const upload = await fetch(signedUrl, {
     method: 'PUT',
     headers: { 'Content-Type': file.type },
     body: file
   });
 
   if (upload.ok) {
-    uploadedFileUrl = `https://${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/media/${path}`;
+    // URL publik file yang bisa diakses
+    uploadedFileUrl = `${supabaseUrl}/storage/v1/object/public/${path}`;
     alert('Upload berhasil!');
   } else {
     alert('Upload gagal');
@@ -343,6 +360,7 @@ chatForm.onsubmit = async (e) => {
   alert(data.answer || 'Tidak ada balasan');
   userInput.value = '';
   uploadedFileUrl = '';
+  fileInput.value = '';
 };
 
   // SW SYSTEM
