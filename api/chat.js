@@ -11,7 +11,7 @@ async function supabaseInsert(data) {
       apikey: SUPABASE_ANON_KEY,
       Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
       'Content-Type': 'application/json',
-      Prefer: 'return=representation' // Supabase agar mengembalikan row yg baru dimasukkan
+      Prefer: 'return=representation'
     },
     body: JSON.stringify(data),
   });
@@ -65,12 +65,10 @@ export default async function handler(req) {
 
     const answer = data.choices?.[0]?.message?.content?.trim() || 'Maaf, terjadi kesalahan.';
 
-    // Simpan prompt dan jawaban ke Supabase via REST API
     try {
       await supabaseInsert({ prompt, answer, created_at: new Date().toISOString() });
     } catch (error) {
       console.error(error);
-      // Bisa tetap lanjutkan jika error insert ke DB, tapi beri tahu user
       return new Response(
         JSON.stringify({ answer, warning: 'Gagal menyimpan chat ke database.' }),
         { headers: { 'Content-Type': 'application/json' } }
