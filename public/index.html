@@ -144,19 +144,38 @@ body.dark #userInput {
 <!-- ───── Chat area ───── -->
 <main id="chatArea" class="flex-1 overflow-y-auto p-4 flex flex-col gap-4"></main>
 
-<form id="chatForm" 
+<form id="chatForm" enctype="multipart/form-data"
   class="border-t border-neutral-800 p-3 flex items-center gap-2
          bg-white light:bg-white dark:bg-black backdrop-blur-md">
+
+  <!-- Input Pesan -->
   <input id="userInput" autocomplete="off" placeholder="Ketik pesan…"
          class="flex-1 text-sm px-4 py-2 rounded-full focus:outline-none
                 focus:ring focus:ring-purple-600/50
                 bg-white light:bg-white dark:bg-black text-black dark:text-white"/>
-  <button class="bg-[var(--bubble-user)] hover:opacity-90 active:opacity-100 transition-opacity text-[var(--bubble-user-text)] rounded-full p-2" aria-label="Kirim">
-  <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-    <line x1="22" y1="2" x2="11" y2="13"/>
-    <polygon points="22 2 15 22 11 13 2 9 22 2"/>
-  </svg>
-</button>
+
+  <!-- Tombol Upload File -->
+  <label for="fileInput"
+         class="cursor-pointer text-[var(--bubble-user-text)] hover:opacity-90 active:opacity-100 transition-opacity rounded-full p-2">
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+         viewBox="0 0 24 24">
+      <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/>
+      <polyline points="7 9 12 4 17 9"/>
+      <line x1="12" y1="4" x2="12" y2="16"/>
+    </svg>
+    <input type="file" id="fileInput" name="file" class="hidden" accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.zip,.rar" />
+  </label>
+
+  <!-- Tombol Kirim -->
+  <button type="submit"
+    class="bg-[var(--bubble-user)] hover:opacity-90 active:opacity-100 transition-opacity text-[var(--bubble-user-text)] rounded-full p-2"
+    aria-label="Kirim">
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+         viewBox="0 0 24 24">
+      <line x1="22" y1="2" x2="11" y2="13"/>
+      <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+    </svg>
+  </button>
 </form>
 
 <script>
