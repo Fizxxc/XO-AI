@@ -310,8 +310,8 @@ fileInput.onchange = async () => {
   const { url, path } = await res.json();
   if (!url) return alert('Gagal dapatkan signed URL');
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL; // dari env
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY; // dari env
+  const supabaseUrl = process.env.SUPABASE_URL; // dari env
+const supabaseAnonKey = process.env.SUPABASE_ANON_KEY; // dari env
 
 fileInput.onchange = async (e) => {
   const file = e.target.files[0];
