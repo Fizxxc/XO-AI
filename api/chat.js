@@ -87,3 +87,14 @@ export default async function handler(req) {
 
   return new Response(JSON.stringify({ error: 'Format request tidak dikenali' }), { status: 400 });
 }
+
+
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/service-worker.js') // sesuaikan nama file
+      .then(function(reg) {
+        console.log('Service Worker registered', reg);
+      })
+      .catch(function(err) {
+        console.log('Service Worker registration failed', err);
+      });
+  }
