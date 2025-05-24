@@ -2,6 +2,8 @@ var urlsToPrefetch = [
   '/',
   '/offline.html',
   '/chat.js',
+  '/favicon.ico',
+  '/manifest.json'
 ];
 
 var version = '1.0.1';
