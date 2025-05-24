@@ -1,50 +1,50 @@
-// @ts-check
-
-/* ------------ Konstanta ------------ */
-const CACHE_NAME   = 'xoai-v1';
-const OFFLINE_URL  = '/offline.html';
-const CORE_ASSETS  = [
-  '/',               // halaman utama
-  OFFLINE_URL,
-  '/chat.js'
+var urlsToPrefetch = [
+  '/',
+  '/offline.html',
+  '/chat.js',
 ];
 
-/* ---------- INSTALL: seed cache ---------- */
-self.addEventListener('install', event => {
+var version = '1.0.1';
+
+self.addEventListener("install", function(event) {
+  console.log('SW: install event in progress.');
   event.waitUntil(
-    caches.open(CACHE_NAME).then(c => c.addAll(CORE_ASSETS))
+    caches
+      .open(version + '-cache')
+      .then(cache => cache.addAll(urlsToPrefetch))
+      .then(() => console.log('SW: install completed'))
   );
-  self.skipWaiting();     // langsung aktif
 });
 
-/* ---------- ACTIVATE: bersih-bersih ---------- */
-self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(
-        keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
-      )
-    )
-  );
-  self.clients.claim();
-});
-
-/* ---------- FETCH: network-first ---------- */
-self.addEventListener('fetch', event => {
-  // Hanya tangani permintaan dokumen (HTML)
-  if (event.request.mode !== 'navigate') return;
+self.addEventListener("fetch", function(event) {
+  if (event.request.method !== 'GET') return;
 
   event.respondWith(
-    fetch(event.request)
-      .then(res => {
-        // Simpan salinan halaman terbaru
-        const clone = res.clone();
-        caches.open(CACHE_NAME).then(c => c.put(event.request, clone));
-        return res;
+    caches.match(event.request)
+      .then(cached => {
+        const fetched = fetch(event.request)
+          .then(response => {
+            const responseClone = response.clone();
+            caches.open(version + '-cache')
+              .then(cache => cache.put(event.request, responseClone));
+            return response;
+          })
+          .catch(() => {
+            return caches.match('/offline.html');
+          });
+
+        return cached || fetched;
       })
-      .catch(() =>
-        // offline → coba cache → fallback offline.html
-        caches.match(event.request).then(res => res || caches.match(OFFLINE_URL))
-      )
+  );
+});
+
+self.addEventListener("activate", function(event) {
+  event.waitUntil(
+    caches.keys().then(keys => {
+      return Promise.all(
+        keys.filter(k => !k.startsWith(version))
+            .map(k => caches.delete(k))
+      );
+    })
   );
 });
