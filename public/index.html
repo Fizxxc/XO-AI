@@ -1,4 +1,4 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id" class="dark">
 <head>
 <meta charset="UTF-8" />
@@ -113,7 +113,6 @@ body.dark #userInput {
   <span class="text-sm text-neutral-400">Memuat&nbsp;data…</span>
 </div>
 
-
 <!-- ───── Header ───── -->
 <header class="border-b border-neutral-800 p-4 flex items-center gap-3">
   <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-[var(--bubble-user)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
@@ -143,43 +142,24 @@ body.dark #userInput {
 
 <!-- ───── Chat area ───── -->
 <main id="chatArea" class="flex-1 overflow-y-auto p-4 flex flex-col gap-4"></main>
-<!-- Preview file upload -->
-<div id="filePreview" class="p-2 px-4 mb-2 max-w-xs mx-4 rounded-lg bg-[var(--bubble-user)] text-[var(--bubble-user-text)] hidden"></div>
-<form id="chatForm" enctype="multipart/form-data"
+
+<form id="chatForm" 
   class="border-t border-neutral-800 p-3 flex items-center gap-2
          bg-white light:bg-white dark:bg-black backdrop-blur-md">
-
-  <!-- Input Pesan -->
   <input id="userInput" autocomplete="off" placeholder="Ketik pesan…"
          class="flex-1 text-sm px-4 py-2 rounded-full focus:outline-none
                 focus:ring focus:ring-purple-600/50
                 bg-white light:bg-white dark:bg-black text-black dark:text-white"/>
-
-  <!-- Tombol Upload File -->
-  <label for="fileInput"
-         class="cursor-pointer text-[var(--bubble-user-text)] hover:opacity-90 active:opacity-100 transition-opacity rounded-full p-2">
-    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-         viewBox="0 0 24 24">
-      <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/>
-      <polyline points="7 9 12 4 17 9"/>
-      <line x1="12" y1="4" x2="12" y2="16"/>
-    </svg>
-    <input type="file" id="fileInput" name="file" class="hidden" accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.zip,.rar" />
-  </label>
-
-  <!-- Tombol Kirim -->
-  <button type="submit"
-    class="bg-[var(--bubble-user)] hover:opacity-90 active:opacity-100 transition-opacity text-[var(--bubble-user-text)] rounded-full p-2"
-    aria-label="Kirim">
-    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-         viewBox="0 0 24 24">
-      <line x1="22" y1="2" x2="11" y2="13"/>
-      <polygon points="22 2 15 22 11 13 2 9 22 2"/>
-    </svg>
-  </button>
+  <button class="bg-[var(--bubble-user)] hover:opacity-90 active:opacity-100 transition-opacity text-[var(--bubble-user-text)] rounded-full p-2" aria-label="Kirim">
+  <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+    <line x1="22" y1="2" x2="11" y2="13"/>
+    <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+  </svg>
+</button>
 </form>
+
 <script>
-/* ───── Tema: inisialisasi berdasarkan preferensi / localStorage ───── */
+/* ───── Tema: inisialisasi berdasar preferensi / localStorage ───── */
 const root = document.documentElement;
 const themeBtn = document.getElementById('themeBtn');
 
@@ -196,7 +176,7 @@ function initTheme() {
   }
 }
 
-themeBtn?.addEventListener('click', () => {
+themeBtn.addEventListener('click', () => {
   if (root.classList.contains('dark')) {
     root.classList.remove('dark');
     root.classList.add('light');
@@ -208,32 +188,35 @@ themeBtn?.addEventListener('click', () => {
   }
 });
 
+// Inisialisasi tema saat halaman dimuat
 window.addEventListener('DOMContentLoaded', initTheme);
 
-/* ───── Chat Helper ───── */
-const chatArea = document.getElementById('chatArea');
 
-function botAvatar() {
+/* ───── Chat helper ───── */
+const chatArea=document.getElementById('chatArea');
+
+function botAvatar(){
   return `<svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-[var(--bubble-user)] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>`;
 }
 
-function addMsg(text, from) {
-  const wrap = document.createElement('div');
-  wrap.className = 'flex gap-2 items-start max-w-prose';
+function addMsg(text,from){
+  const wrap=document.createElement('div');
+  wrap.className='flex gap-2 items-start max-w-prose';
 
-  const bubble = document.createElement('div');
-  bubble.className = `prose prose-sm max-w-none px-4 py-3 rounded-2xl animate-fadeIn ${
-    from === 'user'
-      ? 'bg-[var(--bubble-user)] text-[var(--bubble-user-text)]'
-      : 'bg-[var(--bubble-bot)] text-[var(--fg)]'
-  }`;
-  bubble.innerHTML = marked.parse(text);
+  const bubble=document.createElement('div');
+  /* di fungsi addMsg ubah className bubble */
+bubble.className=`prose prose-sm max-w-none px-4 py-3 rounded-2xl animate-fadeIn ${
+  from==='user'
+   ? 'bg-[var(--bubble-user)] text-[var(--bubble-user-text)]'
+   : 'bg-[var(--bubble-bot)] text-[var(--fg)]'
+}`;
+  bubble.innerHTML=marked.parse(text);
 
-  if (from === 'bot') {
+  if(from==='bot'){
     wrap.appendChild(document.createRange().createContextualFragment(botAvatar()));
-    const label = document.createElement('span');
-    label.textContent = 'XO AI';
-    label.className = 'block text-[10px] uppercase text-[var(--bubble-user)]/80 mb-1';
+    const label=document.createElement('span');
+    label.textContent='XO AI';
+    label.className='block text-[10px] uppercase text-[var(--bubble-user)]/80 mb-1';
     bubble.prepend(label);
   } else {
     wrap.classList.add('self-end');
@@ -241,120 +224,53 @@ function addMsg(text, from) {
 
   wrap.appendChild(bubble);
   chatArea.appendChild(wrap);
-  chatArea.scrollTop = chatArea.scrollHeight;
+  chatArea.scrollTop=chatArea.scrollHeight;
   return bubble;
 }
 
-function typing(el, dur = 2500) {
-  const frames = ['●', '●●', '●●●'];
-  let i = 0;
-  return new Promise(r => {
-    const iv = setInterval(() => {
-      el.textContent = frames[i];
-      i = (i + 1) % frames.length;
-    }, 400);
-    setTimeout(() => {
-      clearInterval(iv);
-      r();
-    }, dur);
+function typing(el,dur=2500){
+  const frames=['●','●●','●●●'];let i=0;
+  return new Promise(r=>{
+    const iv=setInterval(()=>{el.textContent=frames[i];i=(i+1)%frames.length;},400);
+    setTimeout(()=>{clearInterval(iv);r();},dur);
   });
 }
 
-async function ask(prompt) {
-  const res = await fetch('/api/chat', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ prompt }),
-  });
-  const data = await res.json();
-  return res.ok ? data.answer : `Error: ${data.error}`;
+async function ask(prompt){
+  const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt})});
+  const data=await res.json();
+  return res.ok?data.answer:`Error: ${data.error}`;
 }
+
+/* ───── Form submit ───── */
+document.getElementById('chatForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const q=document.getElementById('userInput').value.trim();
+  if(!q) return;
+  addMsg(q,'user');
+  e.target.reset();
+
+  const hold=addMsg('', 'bot');
+  await typing(hold,2000);
+  hold.innerHTML=marked.parse(await ask(q));
+});
 
 /* ───── Splash ───── */
-window.addEventListener('load', () => {
-  setTimeout(() => {
-    document.getElementById('splash')?.classList.add('hidden');
-    addMsg(
-      'Halo! 👋<br/>Saya <strong>XO AI</strong>. Ada yang bisa saya bantu hari ini?<br/><strong>-FizzxDevv</strong>',
-      'bot'
-    );
-  }, 3500);
+window.addEventListener('load',()=>{
+  setTimeout(()=>{
+    document.getElementById('splash').classList.add('hidden');
+    addMsg('Halo! 👋<br/>Saya <strong>XO AI</strong>. Ada yang bisa saya bantu hari ini?','bot');
+  },3500);
 });
 
-/* ───── Upload ───── */
-const chatForm = document.getElementById('chatForm');
-const userInput = document.getElementById('userInput');
-const fileInput = document.getElementById('fileInput');
-const uploadBtn = document.getElementById('uploadBtn');
-let uploadedFileUrl = '';
-
-uploadBtn?.addEventListener('click', () => {
-  fileInput?.click();
-});
-
-fileInput?.addEventListener('change', async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-
-  const path = `media/${Date.now()}_${file.name}`;
-  const signedUrlRes = await fetch(`/api/signed-url?path=${encodeURIComponent(path)}`);
-  const { signedUrl } = await signedUrlRes.json();
-
-  if (!signedUrl) return alert('Gagal mendapatkan signed URL');
-
-  const upload = await fetch(signedUrl, {
-    method: 'PUT',
-    headers: { 'Content-Type': file.type },
-    body: file,
-  });
-
-  if (upload.ok) {
-    const supabaseUrl = 'https://raipjlysscukhltubkvu.supabase.co'; // Ganti dengan URL kamu
-    uploadedFileUrl = `${supabaseUrl}/storage/v1/object/public/${path}`;
-    alert('Upload berhasil!');
-  } else {
-    alert('Upload gagal');
-  }
-});
-
-/* ───── Chat Form Submit ───── */
-chatForm?.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const prompt = userInput.value.trim();
-  if (!prompt) return;
-
-  addMsg(prompt, 'user');
-  const hold = addMsg('', 'bot');
-
-  const finalPrompt = uploadedFileUrl
-    ? `${prompt}\n\n[Lampiran: ${uploadedFileUrl}]`
-    : prompt;
-
-  await typing(hold, 2000);
-
-  const res = await fetch('/api/chat', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ prompt: finalPrompt }),
-  });
-
-  const data = await res.json();
-  hold.innerHTML = marked.parse(data.answer || 'Tidak ada balasan');
-
-  userInput.value = '';
-  uploadedFileUrl = '';
-  fileInput.value = '';
-});
-
-/* ───── Service Worker ───── */
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker
-      .register('/sw.js')
-      .then(reg => console.log('SW terdaftar →', reg.scope))
-      .catch(err => console.error('SW gagal:', err));
-  });
-}
+    window.addEventListener('load', () => {
+      navigator.serviceWorker
+        .register('/sw.js')
+        .then(reg => console.log('SW terdaftar →', reg.scope))
+        .catch(err => console.error('SW gagal:', err));
+    });
+  }
 </script>
 </body>
 </html>
