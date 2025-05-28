@@ -242,40 +242,49 @@ function addMsg(text, from) {
   } else if (from === 'copy') {
     iconWrapper.innerHTML = copyIcon();
   } else {
-    iconWrapper.textContent = from; // misal user text tanpa icon
+    iconWrapper.textContent = from;
   }
 
   const bubble = document.createElement('div');
-  bubble.className = 'bg-gray-100 p-2 rounded-md max-w-full break-words';
-  bubble.textContent = text;
+  bubble.className = `prose prose-sm max-w-none px-4 py-3 rounded-2xl relative animate-fadeIn ${
+    from === 'user'
+      ? 'bg-[var(--bubble-user)] text-[var(--bubble-user-text)]'
+      : 'bg-[var(--bubble-bot)] text-[var(--fg)]'
+  }`;
+  bubble.innerHTML = marked.parse(text);
 
-  wrap.appendChild(iconWrapper);
-  wrap.appendChild(bubble);
-
-  chatArea.appendChild(wrap);
-  chatArea.scrollTop = chatArea.scrollHeight;
-}
-  /* di fungsi addMsg ubah className bubble */
-bubble.className=`prose prose-sm max-w-none px-4 py-3 rounded-2xl animate-fadeIn ${
-  from==='user'
-   ? 'bg-[var(--bubble-user)] text-[var(--bubble-user-text)]'
-   : 'bg-[var(--bubble-bot)] text-[var(--fg)]'
-}`;
-  bubble.innerHTML=marked.parse(text);
-
-  if(from==='bot'){
-    wrap.appendChild(document.createRange().createContextualFragment(botAvatar()));
-    const label=document.createElement('span');
-    label.textContent='XO AI';
-    label.className='block text-[10px] uppercase text-[var(--bubble-user)]/80 mb-1';
+  if (from === 'bot') {
+    const label = document.createElement('span');
+    label.textContent = 'XO AI';
+    label.className = 'block text-[10px] uppercase text-[var(--bubble-user)]/80 mb-1';
     bubble.prepend(label);
+
+    // Tambahkan tombol salin
+    const copyBtn = document.createElement('button');
+    copyBtn.innerHTML = copyIcon();
+    copyBtn.className = 'absolute top-2 right-2 opacity-70 hover:opacity-100 transition';
+    copyBtn.title = 'Salin';
+    copyBtn.onclick = () => {
+      const temp = document.createElement('textarea');
+      temp.value = bubble.innerText.replace('XO AI', '').trim();
+      document.body.appendChild(temp);
+      temp.select();
+      document.execCommand('copy');
+      document.body.removeChild(temp);
+      copyBtn.title = 'Tersalin!';
+      setTimeout(() => copyBtn.title = 'Salin', 1500);
+    };
+
+    bubble.appendChild(copyBtn);
   } else {
     wrap.classList.add('self-end');
   }
 
+  wrap.appendChild(iconWrapper);
   wrap.appendChild(bubble);
   chatArea.appendChild(wrap);
-  chatArea.scrollTop=chatArea.scrollHeight;
+  chatArea.scrollTop = chatArea.scrollHeight;
+
   return bubble;
 }
 
