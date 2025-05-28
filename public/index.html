@@ -277,29 +277,40 @@ function addMsg(text, from) {
 
   // Tambahkan tombol salin di luar bubble untuk bot
   if (from === 'bot') {
-    const copyBtn = document.createElement('button');
-    copyBtn.innerHTML = copyIcon();
-    copyBtn.className = 'absolute -bottom-2 right-0 translate-y-full text-sm opacity-70 hover:opacity-100 transition';
-    copyBtn.title = 'Salin';
+  // Container pembungkus bubble untuk relative positioning
+  const bubbleWrapper = document.createElement('div');
+  bubbleWrapper.className = 'relative w-fit'; // posisi relatif agar absolute bekerja di dalamnya
 
-    copyBtn.onclick = () => {
-      const temp = document.createElement('textarea');
-      temp.value = bubble.innerText.replace('XO AI', '').trim();
-      document.body.appendChild(temp);
-      temp.select();
-      document.execCommand('copy');
-      document.body.removeChild(temp);
+  // Salin bubble ke dalam wrapper
+  bubbleWrapper.appendChild(bubble);
+  wrap.appendChild(iconWrapper);
+  wrap.appendChild(bubbleWrapper);
+  chatArea.appendChild(wrap);
 
-      copyBtn.innerHTML = checkIcon();
-      copyBtn.title = 'Tersalin!';
-      setTimeout(() => {
-        copyBtn.innerHTML = copyIcon();
-        copyBtn.title = 'Salin';
-      }, 1500);
-    };
+  const copyBtn = document.createElement('button');
+  copyBtn.innerHTML = copyIcon();
+  copyBtn.className = 'absolute bottom-1 right-1 text-sm opacity-70 hover:opacity-100 transition';
+  copyBtn.title = 'Salin';
 
-    wrap.appendChild(copyBtn);
-  }
+  copyBtn.onclick = () => {
+    const temp = document.createElement('textarea');
+    temp.value = bubble.innerText.replace('XO AI', '').trim();
+    document.body.appendChild(temp);
+    temp.select();
+    document.execCommand('copy');
+    document.body.removeChild(temp);
+
+    copyBtn.innerHTML = checkIcon();
+    copyBtn.title = 'Tersalin!';
+    setTimeout(() => {
+      copyBtn.innerHTML = copyIcon();
+      copyBtn.title = 'Salin';
+    }, 1500);
+  };
+
+  bubbleWrapper.appendChild(copyBtn);
+}
+
 
   chatArea.scrollTop = chatArea.scrollHeight;
   return bubble;
